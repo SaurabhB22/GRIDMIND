@@ -185,4 +185,6 @@ Hackathon Theme:
 
 # Repository
 
-https://github.com/SaurabhB22/GRIDMIND
+Source code: https://github.com/SaurabhB22/GRIDMIND
+Github pages: https://saurabhb22.github.io/GRIDMIND/
+
