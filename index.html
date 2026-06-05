@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GridMind — Kazakhstan Power Grid Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="tooltip-box" id="tooltip"></div>
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text">GridMind</div>
+      <div class="logo-sub">Kazakhstan National Power Intelligence System</div>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="status-dot"></div>
+    <span class="live-badge">● LIVE</span>
+    <span class="time-display" id="clockDisplay">--:--:--</span>
+    <span style="color:var(--text-dim)">|</span>
+    <span style="font-size:11px">ASTANA UTC+5</span>
+  </div>
+</header>
+<nav class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
+  <button class="tab-btn" onclick="switchTab('map')">🗺️ Grid Map</button>
+  <button class="tab-btn" onclick="switchTab('circuit')">⚡ Circuit Diagram</button>
+  <button class="tab-btn" onclick="switchTab('forecast')">📈 24h Forecast</button>
+  <button class="tab-btn" onclick="switchTab('insights')">🤖 AI Insights</button>
+</nav>
+<div class="main">
+<div class="alert-ticker">
+  <span class="ticker-label">⚠️SYSTEM ALERTS</span>
+  <div class="ticker-scroll">
+    <span class="ticker-inner">
+      [14:23 AST] Zhambyl 500kV substation operating at 94% capacity — monitor closely &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      [14:18 AST] North-South corridor load increased by 340 MW due to industrial surge in Karaganda &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      [14:05 AST] Wind generation from Zhongar Gate corridor at 187 MW — exceeding forecast by 12% &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      [13:55 AST] Ekibastuz GRES-1 Unit 8 maintenance completed — back online, full capacity 500 MW &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      [13:42 AST] Import from Russia (OES Ural) stable at 480 MW as per seasonal deficit agreement &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+      [13:30 AST] Almaty demand peak expected at 19:00 AST — preparing load balancing protocols
+    </span>
+  </div>
+</div>
+<div id="tab-overview" class="tab-panel active">
+  <div class="kpi-grid">
+    <div class="kpi-card cyan">
+      <div class="kpi-label">Total Generation</div>
+      <div class="kpi-value" id="kpi-gen">14.82<span class="kpi-unit">GW</span></div>
+      <div class="kpi-delta up" id="kpi-gen-d">↑ +0.3% vs 1hr ago</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">System Load</div>
+      <div class="kpi-value" id="kpi-load">15.31<span class="kpi-unit">GW</span></div>
+      <div class="kpi-delta neutral">Imports: 490 MW</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Grid Frequency</div>
+      <div class="kpi-value" id="kpi-freq">49.98<span class="kpi-unit">Hz</span></div>
+      <div class="kpi-delta neutral">Nominal: 50.00 Hz</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Renewables Share</div>
+      <div class="kpi-value" id="kpi-ren">14.2<span class="kpi-unit">%</span></div>
+      <div class="kpi-delta up">↑ +2.1% vs yesterday</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Grid Stress Index</div>
+      <div class="kpi-value" id="kpi-stress">68<span class="kpi-unit">/100</span></div>
+      <div class="kpi-delta down">↓ Medium-High Risk</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">⚡ Live Generation Mix & Load</span>
+        <span class="card-badge">REAL-TIME</span>
+      </div>
+      <div class="chart-wrap" style="padding:18px">
+        <canvas id="genChart" style="max-height:200px"></canvas>
+      </div>
+      <div style="padding:0 18px 18px">
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>🔥 Thermal (Coal/Gas CHP)</span><span>11.08 GW · 74.8%</span></div>
+          <div class="progress-track"><div class="progress-fill amber" style="width:74.8%"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>💧 Hydropower</span><span>1.41 GW · 9.5%</span></div>
+          <div class="progress-track"><div class="progress-fill cyan" style="width:9.5%"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>🌬️ Wind + Solar + Biogas</span><span>2.11 GW · 14.2%</span></div>
+          <div class="progress-track"><div class="progress-fill green" style="width:14.2%"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>🔌 Import (Russia + Uzbekistan)</span><span>0.49 GW · 3.3%</span></div>
+          <div class="progress-track"><div class="progress-fill red" style="width:3.3%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🔌 Regional Substations</span>
+        <span class="card-badge">18 NODES</span>
+      </div>
+      <div class="node-list" id="nodeList"></div>
+    </div>
+  </div>
+
+  <div class="three-col">
+    <div class="card">
+      <div class="card-header"><span class="card-title">📡 500kV Bus Voltages</span></div>
+      <div class="chart-wrap"><canvas id="voltChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">〰 System Frequency</span><span class="card-badge">60-SEC</span></div>
+      <div class="chart-wrap"><canvas id="freqChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">🔀 Inter-Zone Power Flow</span></div>
+      <div class="chart-wrap"><canvas id="flowChart"></canvas></div>
+    </div>
+  </div>
+</div>
+<div id="tab-map" class="tab-panel">
+  <div class="two-col">
+    <div class="card" style="position:relative">
+      <div class="card-header">
+        <span class="card-title">🗺️ Kazakhstan High-Voltage Grid Map</span>
+        <span class="card-badge">500kV / 220kV</span>
+      </div>
+      <canvas id="kzMap"></canvas>
+      <div class="map-popup" id="mapPopup"></div>
+    </div>
+    <div class="sidebar-panel">
+      <div class="card">
+        <div class="card-header"><span class="card-title">📍 Key Infrastructure</span></div>
+        <div style="padding:14px; font-size:12px; color:var(--text-mid); line-height:1.8; font-family:var(--font-mono)">
+          <div style="margin-bottom:10px; color:var(--accent-cyan); font-weight:600">Power Plants</div>
+          <div>• Ekibastuz GRES-1 — 4,000 MW (Coal)</div>
+          <div>• Ekibastuz GRES-2 — 1,000 MW (Coal)</div>
+          <div>• Balkhash CHP — 2,135 MW</div>
+          <div>• Karaganda CHP-3 — 510 MW</div>
+          <div>• Kapchagay HPP — 364 MW (Hydro)</div>
+          <div>• Shardara HPP — 320 MW (Hydro)</div>
+          <div>• Zhongar Wind — 200 MW (Wind)</div>
+          <div style="margin:10px 0; color:var(--accent-cyan); font-weight:600">500kV Substations</div>
+          <div>• Astana 500kV (New Digital)</div>
+          <div>• Zhambyl 500kV (ADB Upgrade)</div>
+          <div>• Shu 500kV (Reconstructed)</div>
+          <div>• Shymkent 500kV</div>
+          <div>• Kokshetau 500kV</div>
+          <div>• Ekibastuz 1150→500kV</div>
+          <div style="margin:10px 0; color:var(--accent-cyan); font-weight:600">Transmission Corridors</div>
+          <div>• North-South Main (500kV)</div>
+          <div>• Ekibastuz–Kokshetau (432km)</div>
+          <div>• Karaganda–Astana (~200km)</div>
+          <div>• West Integration Project (HVDC)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📊 Zone Load Balance</span></div>
+        <div class="chart-wrap" style="padding:14px"><canvas id="zoneChart" style="max-height:180px"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-circuit" class="tab-panel">
+  <div style="display:grid; grid-template-columns:1fr 360px; gap:16px">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Single-Line Circuit Diagram — Kazakhstan 500kV Backbone</span>
+        <span class="card-badge">INTERACTIVE</span>
+      </div>
+      <canvas id="circuitCanvas" style="width:100%;height:480px;display:block"></canvas>
+    </div>
+    <div class="sidebar-panel">
+      <div class="card">
+        <div class="card-header"><span class="card-title">🔧 Circuit Components</span></div>
+        <div style="overflow-x:auto">
+          <table class="parts-table">
+            <thead>
+              <tr><th>Component</th><th>Type</th><th>Rating</th><th>Status</th></tr>
+            </thead>
+            <tbody id="partsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📘 Circuit Legend</span></div>
+        <div style="padding:14px; font-size:12px; display:flex; flex-direction:column; gap:8px; font-family:var(--font-mono)">
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:4px;background:#00e5ff;border-radius:2px"></div><span style="color:var(--text-mid)">500kV Transmission Line</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:4px;background:#00e676;border-radius:2px"></div><span style="color:var(--text-mid)">220kV Transmission Line</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:4px;background:#ffab00;border-radius:2px"></div><span style="color:var(--text-mid)">110kV Distribution Line</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:20px;height:20px;border-radius:50%;background:rgba(0,229,255,0.2);border:2px solid #00e5ff;"></div><span style="color:var(--text-mid)">500kV Substation Bus</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:20px;height:20px;background:rgba(0,230,118,0.2);border:2px solid #00e676;border-radius:4px"></div><span style="color:var(--text-mid)">Power Plant / Generator</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:20px;height:20px;background:rgba(255,171,0,0.2);border:2px solid #ffab00;border-radius:4px"></div><span style="color:var(--text-mid)">220kV Substation</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="#7c4dff" stroke-width="2"/><text x="10" y="14" text-anchor="middle" fill="#7c4dff" font-size="10">T</text></svg>
+            <span style="color:var(--text-mid)">Autotransformer</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg width="20" height="14"><rect x="2" y="4" width="16" height="6" rx="2" fill="none" stroke="#ff1744" stroke-width="2"/><line x1="10" y1="0" x2="10" y2="4" stroke="#ff1744" stroke-width="2"/><line x1="10" y1="10" x2="10" y2="14" stroke="#ff1744" stroke-width="2"/></svg>
+            <span style="color:var(--text-mid)">Circuit Breaker</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title"> Selected Node Info</span></div>
+        <div id="selectedNodeInfo" style="padding:14px;font-size:12px;color:var(--text-mid);font-family:var(--font-mono);min-height:80px">
+          Click a node on the circuit diagram to view details...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-forecast" class="tab-panel">
+  <div class="forecast-grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">24-Hour Energy Demand Forecast — ML Model (LSTM + XGBoost Ensemble)</span>
+        <span class="card-badge">MAPE: 2.1%</span>
+      </div>
+      <div class="chart-wrap" style="padding:18px"><canvas id="forecastChart" style="max-height:280px"></canvas></div>
+    </div>
+    <div class="sidebar-panel">
+      <div class="card">
+        <div class="card-header"><span class="card-title">🧠 Model Performance</span></div>
+        <div class="metrics-grid">
+          <div class="metric-box"><div class="metric-box-val">97.9%</div><div class="metric-box-label">Accuracy</div></div>
+          <div class="metric-box"><div class="metric-box-val">2.1%</div><div class="metric-box-label">MAPE</div></div>
+          <div class="metric-box" style="--accent-cyan:var(--accent-green)"><div class="metric-box-val" style="color:var(--accent-green)">0.41</div><div class="metric-box-label">RMSE (GW)</div></div>
+          <div class="metric-box" style="--accent-cyan:var(--accent-amber)"><div class="metric-box-val" style="color:var(--accent-amber)">R²=0.97</div><div class="metric-box-label">Fit Score</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🔮 Peak Predictions</span></div>
+        <div style="padding:14px;font-size:12px;display:flex;flex-direction:column;gap:10px;font-family:var(--font-mono)">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px">
+            <div style="color:var(--accent-amber);font-weight:600;margin-bottom:4px">Morning Peak</div>
+            <div style="color:var(--text)">09:00–10:30 AST</div>
+            <div style="color:var(--text-mid);font-size:11px">Forecast: <span style="color:var(--accent-cyan)">16.2 GW</span></div>
+            <div style="color:var(--text-dim);font-size:11px">Confidence: 94%</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid rgba(255,23,68,0.3);border-radius:8px;padding:10px">
+            <div style="color:var(--accent-red);font-weight:600;margin-bottom:4px">Evening Peak ⚠️</div>
+            <div style="color:var(--text)">19:00–21:00 AST</div>
+            <div style="color:var(--text-mid);font-size:11px">Forecast: <span style="color:var(--accent-red)">17.1 GW</span></div>
+            <div style="color:var(--text-dim);font-size:11px">Confidence: 91% · Near deficit</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px">
+            <div style="color:var(--accent-green);font-weight:600;margin-bottom:4px">Low Demand</div>
+            <div style="color:var(--text)">03:00–05:00 AST</div>
+            <div style="color:var(--text-mid);font-size:11px">Forecast: <span style="color:var(--accent-green)">10.8 GW</span></div>
+            <div style="color:var(--text-dim);font-size:11px">Pump storage opportunity</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="three-col">
+    <div class="card">
+      <div class="card-header"><span class="card-title">🌱 Renewable Forecast (24h)</span></div>
+      <div class="chart-wrap"><canvas id="renewForecastChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">📊 Regional Demand Split</span></div>
+      <div class="chart-wrap"><canvas id="regionalDemandChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">💰 Generation Cost Forecast</span></div>
+      <div class="chart-wrap"><canvas id="costChart"></canvas></div>
+    </div>
+  </div>
+</div>
+<div id="tab-insights" class="tab-panel">
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🤖 AI-Generated Grid Insights</span>
+        <span class="card-badge" id="insightCount">12 INSIGHTS</span>
+      </div>
+      <div class="insight-list" id="insightList"></div>
+    </div>
+    <div class="sidebar-panel">
+      <div class="card">
+        <div class="card-header"><span class="card-title">📊 Anomaly Detection</span></div>
+        <div class="chart-wrap"><canvas id="anomalyChart" style="max-height:200px"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🌡️ Heat Map — Grid Stress</span></div>
+        <canvas id="heatmapCanvas" style="width:100%;height:180px;display:block;padding:14px;box-sizing:border-box"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">⚙️ ML Model Stack</span></div>
+        <div style="padding:14px;font-size:12px;color:var(--text-mid);font-family:var(--font-mono);line-height:1.9">
+          <div style="color:var(--accent-cyan)">Demand Forecasting</div>
+          <div>→ LSTM (72h lookback) + XGBoost Ensemble</div>
+          <div style="color:var(--accent-green);margin-top:8px">Anomaly Detection</div>
+          <div>→ Isolation Forest + Autoencoder (VAE)</div>
+          <div style="color:var(--accent-amber);margin-top:8px">Fault Prediction</div>
+          <div>→ Random Forest Classifier (F1=0.89)</div>
+          <div style="color:var(--accent-purple);margin-top:8px">Renewable Forecasting</div>
+          <div>→ NWP + Gradient Boosting (ERA5 data)</div>
+          <div style="color:var(--accent-red);margin-top:8px">Load Balancing</div>
+          <div>→ Deep Q-Network (Reinforcement Learning)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
