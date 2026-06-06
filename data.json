@@ -1,0 +1,28 @@
+{
+    "timestamp": "2026-06-06T10:05:00Z",
+    "grid_frequency_hz": 51.5,
+    "renewable_share_percentage": 14.6,
+    "substations": [
+        {
+            "id": "SS_ASTANA",
+            "name": "Astana Substation",
+            "voltage_kv": 500,
+            "status": "Stable",
+            "load_mw": 840
+        },
+        {
+            "id": "SS_ALMATY",
+            "name": "Almaty Substation",
+            "voltage_kv": 500,
+            "status": "Warning",
+            "load_mw": 1250
+        },
+        {
+            "id": "SS_EKIBASTUZ",
+            "name": "Ekibastuz Generation Hub",
+            "voltage_kv": 1150,
+            "status": "Stable",
+            "load_mw": 4200
+        }
+    ]
+}
