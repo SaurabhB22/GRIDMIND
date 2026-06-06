@@ -52,7 +52,6 @@ const AI_INSIGHTS = [
   { type: 'success', title: '🔒 SCADA Cyber Security — Normal', body: 'All IEC 61850 SCADA nodes reporting nominal. No anomalies in network traffic. PMU phasor data synchronization across 18 substations operating within ±1μs time alignment.', time: '2h ago' },
 ];
 
-// ===================== CLOCK =====================
 function updateClock() {
   const now = new Date();
   // Kazakhstan UTC+5
@@ -62,7 +61,6 @@ function updateClock() {
 }
 setInterval(updateClock, 1000); updateClock();
 
-// ===================== TABS =====================
 function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -73,7 +71,6 @@ function switchTab(name) {
   if (name === 'insights') setTimeout(drawHeatmap, 50);
 }
 
-// ===================== NODE LIST =====================
 function buildNodeList() {
   const list = document.getElementById('nodeList');
   REGIONS.forEach(r => {
@@ -91,7 +88,6 @@ function buildNodeList() {
 }
 buildNodeList();
 
-// ===================== PARTS TABLE =====================
 function buildPartsTable() {
   const tb = document.getElementById('partsTableBody');
   CIRCUIT_PARTS.forEach(p => {
@@ -105,7 +101,6 @@ function buildPartsTable() {
 }
 buildPartsTable();
 
-// ===================== AI INSIGHTS =====================
 function buildInsights() {
   const list = document.getElementById('insightList');
   AI_INSIGHTS.forEach(ins => {
@@ -118,7 +113,6 @@ function buildInsights() {
 }
 buildInsights();
 
-// ===================== CHART DEFAULTS =====================
 Chart.defaults.color = '#607d8b';
 Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
 Chart.defaults.font.family = "'JetBrains Mono', monospace";
@@ -129,7 +123,6 @@ function makeGrad(ctx, c1, c2) {
   g.addColorStop(0, c1); g.addColorStop(1, c2); return g;
 }
 
-// ===== GENERATION CHART =====
 (function() {
   const ctx = document.getElementById('genChart').getContext('2d');
   const hrs = Array.from({length:24}, (_,i) => i+':00');
@@ -148,7 +141,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===== VOLTAGE CHART =====
 (function() {
   const ctx = document.getElementById('voltChart').getContext('2d');
   const subs = ['Ekibastuz', 'Kokshetau', 'Astana', 'Karaganda', 'Zhambyl', 'Almaty'];
@@ -163,7 +155,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===== FREQUENCY CHART =====
 (function() {
   const ctx = document.getElementById('freqChart').getContext('2d');
   const pts = 60;
@@ -181,13 +172,11 @@ function makeGrad(ctx, c1, c2) {
     fcChart.data.datasets[0].data.shift();
     fcChart.data.datasets[0].data.push(49.95 + Math.random() * 0.1);
     fcChart.update('none');
-    // Update KPIs with small drift
     const newF = (49.95 + Math.random() * 0.1).toFixed(2);
     document.getElementById('kpi-freq').innerHTML = newF + '<span class="kpi-unit">Hz</span>';
   }, 1500);
 })();
 
-// ===== FLOW CHART =====
 (function() {
   const ctx = document.getElementById('flowChart').getContext('2d');
   new Chart(ctx, {
@@ -200,7 +189,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===== ZONE CHART =====
 (function() {
   const ctx = document.getElementById('zoneChart').getContext('2d');
   new Chart(ctx, {
@@ -213,7 +201,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===== FORECAST CHART =====
 (function() {
   const ctx = document.getElementById('forecastChart').getContext('2d');
   const hrs = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
@@ -236,7 +223,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===== RENEWABLE FORECAST =====
 (function() {
   const ctx = document.getElementById('renewForecastChart').getContext('2d');
   const hrs = Array.from({length:24}, (_,i) => i);
@@ -254,7 +240,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===== REGIONAL DEMAND =====
 (function() {
   const ctx = document.getElementById('regionalDemandChart').getContext('2d');
   new Chart(ctx, {
@@ -266,7 +251,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===== COST CHART =====
 (function() {
   const ctx = document.getElementById('costChart').getContext('2d');
   const hrs = Array.from({length:24}, (_,i) => i + 'h');
@@ -280,7 +264,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===== ANOMALY CHART =====
 (function() {
   const ctx = document.getElementById('anomalyChart').getContext('2d');
   const pts = Array.from({length:48}, (_,i) => ({ x: i, y: 0.2 + Math.random() * 0.6 }));
@@ -297,7 +280,6 @@ function makeGrad(ctx, c1, c2) {
   });
 })();
 
-// ===================== MAP DRAWING =====================
 function drawMap() {
   const canvas = document.getElementById('kzMap');
   const ctx = canvas.getContext('2d');
@@ -318,7 +300,7 @@ function drawMap() {
   ctx.fillStyle = '#040d1a';
   ctx.fillRect(0, 0, W, H);
 
-  // Draw Kazakhstan border (simplified polygon)
+  // Draw Kazakhstan border(simplified polygon)
   const border = [
     [55.4, 50.3],[54.7, 51.2],[54.0, 52.8],[53.5, 54.1],[52.6, 53.5],
     [51.8, 51.4],[51.2, 52.5],[50.8, 52.0],[50.3, 51.4],[49.0, 51.8],
@@ -348,7 +330,6 @@ function drawMap() {
   ctx.strokeStyle = 'rgba(0,229,255,0.3)';
   ctx.lineWidth = 1.5; ctx.stroke();
 
-  // Draw transmission lines
   const lines = [
     ['Ekibastuz', 'Kokshetau', '#00e5ff', 2.5, '500kV'],
     ['Ekibastuz', 'Pavlodar', '#00e5ff', 2, '500kV'],
@@ -381,7 +362,6 @@ function drawMap() {
     ctx.stroke();
   });
 
-  // Animated flow particles
   const particles = [];
   lines.forEach(([a, b, color]) => {
     const p1 = nodeMap[a], p2 = nodeMap[b];
@@ -524,7 +504,6 @@ function drawMap() {
   };
 }
 
-// ===================== CIRCUIT DIAGRAM =====================
 function drawCircuit() {
   const canvas = document.getElementById('circuitCanvas');
   const ctx = canvas.getContext('2d');
@@ -535,7 +514,6 @@ function drawCircuit() {
 
   ctx.fillStyle = '#040d1a'; ctx.fillRect(0, 0, W, H);
 
-  // Circuit nodes definition
   const nodes = [
     { id: 'GRES1', label: 'Ekibastuz\nGRES-1\n4000MW', x: 0.08, y: 0.2, type: 'gen', color: '#00e676' },
     { id: 'GRES2', label: 'Ekibastuz\nGRES-2\n1000MW', x: 0.08, y: 0.55, type: 'gen', color: '#00e676' },
@@ -702,7 +680,6 @@ function drawCircuit() {
   };
 }
 
-// ===================== HEATMAP =====================
 function drawHeatmap() {
   const canvas = document.getElementById('heatmapCanvas');
   const ctx = canvas.getContext('2d');
@@ -738,7 +715,6 @@ function drawHeatmap() {
   });
 }
 
-// ===================== REAL-TIME KPI UPDATE =====================
 setInterval(() => {
   const genVal = (14.5 + Math.random() * 0.6).toFixed(2);
   const loadVal = (15.1 + Math.random() * 0.4).toFixed(2);
@@ -752,8 +728,6 @@ setInterval(() => {
   document.getElementById('kpi-gen-d').textContent = `↑ +${(Math.random() * 0.5).toFixed(1)}% vs 1hr ago`;
 }, 5000);
 
-// ===================== INIT =====================
-// Pre-draw static stuff
 drawMap();
 setTimeout(drawCircuit, 100);
 setTimeout(drawHeatmap, 200);
