@@ -1,6 +1,6 @@
 function evaluateGridRules(telemetryData) {
 
-    const alertsContainer = document.getElementById('insightList'); 
+    const alertsContainer = document.getElementById('tab-insights'); 
     
     if (!alertsContainer) {
         console.warn("Alerts container ('insightList') nahi mila!");
