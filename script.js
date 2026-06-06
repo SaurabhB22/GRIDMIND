@@ -142,11 +142,28 @@ function makeGrad(ctx, c1, c2) {
       datasets: [
         { label: 'Generation (GW)', data: gen, borderColor: '#00e5ff', borderWidth: 2, pointRadius: 0, fill: true, backgroundColor: makeGrad(ctx, 'rgba(0,229,255,0.15)', 'rgba(0,229,255,0.01)'), tension: 0.4 },
         { label: 'Load (GW)', data: load, borderColor: '#ff1744', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4, borderDash: [5,3] },
-      ]
-    },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#90a4ae', boxWidth: 16 } } }, scales: { x: { ticks: { maxTicksLimit: 8 } }, y: { min: 9, max: 18, ticks: { callback: v => v + 'GW' } } } }
-  });
-})();
+       ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+        }
+      });
+    })();
+function updateLiveGridData(newGen, newLoad, timestamp) {
+    if (typeof generationChart !== 'undefined' && generationChart) {
+        generationChart.data.labels.push(timestamp);
+        generationChart.data.datasets[0].data.push(newGen);
+        generationChart.data.datasets[1].data.push(newLoad);
+        
+        if (generationChart.data.labels.length > 10) {
+            generationChart.data.labels.shift();
+            generationChart.data.datasets[0].data.shift();
+            generationChart.data.datasets[1].data.shift();
+        }
+        generationChart.update('none');
+    }
+}
 
 // ===== VOLTAGE CHART =====
 (function() {
@@ -753,7 +770,32 @@ setInterval(() => {
 }, 5000);
 
 // ===================== INIT =====================
-// Pre-draw static stuff
 drawMap();
 setTimeout(drawCircuit, 100);
 setTimeout(drawHeatmap, 200);
+
+function fetchLiveTelemetry() {
+    fetch('data.json')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Live Telemetry Received:", data);
+            
+            
+            if(document.getElementById('grid-frequency')) {
+                document.getElementById('grid-frequency').innerText = `${data.grid_frequency_hz} Hz`;
+            }
+            if(document.getElementById('renewable-share')) {
+                document.getElementById('renewable-share').innerText = `${data.renewable_share_percentage}%`;
+            }
+            
+          
+            if (typeof evaluateGridRules === 'function') {
+                evaluateGridRules(data);
+            }
+        })
+        .catch(error => console.error("Data load karne m error:", error));
+}
+
+setInterval(fetchLiveTelemetry, 5000);
+
+fetchLiveTelemetry();
